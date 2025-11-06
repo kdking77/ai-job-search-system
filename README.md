@@ -9,7 +9,7 @@
 ## Why This Exists
 
 Job searching is fundamentally broken:
-- **11 hours/week** spent on average applying to positions
+- **upwards of 20 hours/week** spent on average applying to positions
 - **70% of applications** go to poorly-matched roles
 - Manual tracking is tedious and error-prone
 - No systematic way to learn from patterns
