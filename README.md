@@ -163,7 +163,7 @@ A battle-tested prompt system that evaluates job postings using a structured 10-
 
 ## Phase 2: Complete Automation
 
-**Status:** ✅ Complete | **Platform:** N8N | **Cost:** ~$25/month N8N + ~$5/month OpenAI API
+**Status:** ✅ Complete | **Platform:** N8N | **Cost:** ~$25/month N8N + ~$2/month OpenAI API
 
 ### Part 1: Job Evaluation & Logging Automation
 
