@@ -387,7 +387,7 @@ Based on actual evaluation of "Customer Operations Manager" role at Funnel Leasi
 - Documentation and knowledge capture
 
 ### Technical Implementation
-- JavaScript for data transformation
+- JavaScript implementation (code modification and integration)
 - Gmail search syntax for filtering
 - Google Sheets formula integration
 - API rate limiting consideration
