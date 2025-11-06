@@ -374,7 +374,7 @@ Based on actual evaluation of "Customer Operations Manager" role at Funnel Leasi
 
 ### Data Engineering
 - HTML parsing and text extraction
-- Regular expression pattern matching
+- Regular expression implementation for text processing
 - JSON manipulation and field mapping
 - Multi-column lookup logic
 - Data normalization and cleaning
