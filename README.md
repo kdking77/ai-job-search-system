@@ -401,16 +401,14 @@ Based on actual evaluation of "Customer Operations Manager" role at Funnel Leasi
 
 **1. JavaScript-Heavy Job Sites**
 
-**Issue:** Sites using JavaScript frameworks (React, Vue, Angular) to load content dynamically return "You need JavaScript to run this app" message instead of job description.
+**Issue:** Sites using JavaScript frameworks to load content dynamically return "You need JavaScript to run this app" message instead of job description.
 
-**Affected Sites:** Workable, Ashby, some Lever implementations
+**Affected Sites:** Ashby. Other modern ATS systems using JavaScript frameworks may have similar issues.
 
-**Identification:** Ashby is easily identifiable by URL structure (`ashbyhq.com` in link)
+**Identification:** Ashby is easily identifiable by URL structure (`ashbyhq.com` in application link)
 
 **Workaround:** 
-- Manually copy job description text and paste into a simple text file
-- Upload to Google Docs manually for archiving
-- Continue using automated evaluation and tracking for other fields
+Manually copy job description text and paste into a Google Doc in the "Job Search Intelligence" folder. Maintain consistent naming: [Company Name] - [Job Title]. This preserves the archive for interview prep while keeping organization consistent with automated documents.
 
 **Why Not Fixed:** Rendering JavaScript requires headless browser (Puppeteer/Browserless), adding significant cost and complexity. Server-rendered sites (Greenhouse, direct company career pages, SmartRecruiters) work perfectly.
 
@@ -428,6 +426,8 @@ Based on actual evaluation of "Customer Operations Manager" role at Funnel Leasi
 - **Recommended:** Add conditional formatting to spreadsheet:
   - `IF(Interview Request = TRUE, background = RED)`
   - Visual indicator for action-needed items
+
+-  **Optional Enhancement:** Add Gmail labeling to interview path (additional node or code modification). Apply "🎯 Interview Request" label to emails after processing. Visual indicator in inbox for action items without relying on unread status.
 
 **Why Not Fixed:** Gmail API marks emails as accessed when read; changing this breaks email monitoring functionality.
 
