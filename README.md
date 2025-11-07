@@ -747,26 +747,47 @@ This project demonstrates end-to-end problem-solving:
 
 ---
 
-### 💻 For Technical Audiences
+### 💼 For Operations & Enablement Professionals
 
-**Interested in workflow automation architecture?**
+**Interested in workflow automation without a coding background?**
 
-**Technical Highlights:**
-- N8N as orchestration layer (vs. Zapier/Make for flexibility)
-- GPT-4o-mini for cost optimization (~$0.001-0.003/evaluation)
-- Dual-path conditional logic (rejection vs. interview)
-- HTML cleaning regex handling edge cases
-- OAuth 2.0 for Google Workspace integration
-- Multi-column lookup workaround (Google Sheets API limitation)
+This project demonstrates how process improvement thinking translates to no-code automation:
 
-**Code Examples:** Available in `/workflows` and `/scripts` folders
+**What This Shows:**
+- **Process redesign methodology:** Identifying waste, building systematic solutions, measuring outcomes
+- **No-code implementation:** N8N workflow orchestration with 13 total nodes across 2 workflows
+- **Data-driven optimization:** Metrics-based threshold adjustment (8.8+ discovery through real-world testing)
+- **Cross-platform integration:** Google Workspace, OpenAI API, email monitoring, form triggers
+- **Iterative refinement:** Continuous improvement based on pattern recognition and user feedback
 
-**Open Questions:**
-- Headless browser integration for JS-heavy sites (cost/benefit analysis?)
-- Real-time notifications vs. polling (Push vs. Pull trade-offs?)
-- Machine learning for rejection prediction (feasible with dataset size?)
+**Key Automation Concepts:**
+- Multi-node workflow design with conditional branching (if/then logic)
+- API integration without traditional coding (OAuth setup, credential management)
+- HTML parsing and text transformation (cleaning messy data for clean outputs)
+- Scheduled triggers and polling strategies (balancing frequency with resource usage)
+- Automated tracking with human-in-the-loop quality control
 
-**Let's discuss:** Reach out to talk workflow automation approaches, LLM optimization, or N8N implementation patterns.
+**Real-World Considerations:**
+- When to automate vs. maintain manual review (quality/control trade-offs)
+- Scaling implications (what happens at higher volumes?)
+- Platform selection criteria (N8N vs. Make vs. Zapier - flexibility vs. ease-of-use)
+- Cost-benefit analysis ($30-35/month for significant time savings)
+- Limitation identification and workaround development (JavaScript-heavy sites, API constraints)
+
+**Skills Transferable to Other Projects:**
+- Systematic problem decomposition
+- Workflow visualization and documentation
+- Error handling and troubleshooting approaches
+- Data schema design for tracking/analysis
+- User experience considerations in automation design
+
+**Questions Worth Exploring:**
+- How do you balance automation sophistication with maintainability?
+- What's the threshold where manual processes should be automated?
+- How do you validate that automation is actually improving outcomes?
+- What metrics matter vs. what's just interesting data?
+
+**Let's connect:** Reach out to discuss process automation, no-code tools, systematic problem-solving, or transitioning from manual processes to automated workflows.
 
 ---
 
