@@ -414,26 +414,7 @@ Manually copy job description text and paste into a Google Doc in the "Job Searc
 
 ---
 
-**2. AI Email Processing**
-
-**Issue:** If AI reads emails before user, inbox shows emails as "read" and user might miss interview requests.
-
-**Impact:** User workflow disruption (relies on unread count as notification)
-
-**Solution:** 
-- **Use spreadsheet as source of truth**, not inbox
-- Check "Interview Request" column daily instead of unread emails
-- **Recommended:** Add conditional formatting to spreadsheet:
-  - `IF(Interview Request = TRUE, background = RED)`
-  - Visual indicator for action-needed items
-
--  **Optional Enhancement:** Add Gmail labeling to interview path (additional node or code modification). Apply "🎯 Interview Request" label to emails after processing. Visual indicator in inbox for action items without relying on unread status.
-
-**Why Not Fixed:** Gmail API marks emails as accessed when read; changing this breaks email monitoring functionality.
-
----
-
-**3. Job Alert Noise**
+**2. Job Alert Noise**
 
 **Issue:** Job alerts from LinkedIn, Indeed sometimes pass initial filters.
 
@@ -445,7 +426,7 @@ Manually copy job description text and paste into a Google Doc in the "Job Searc
 
 ---
 
-**4. HTML Formatting Variance**
+**3. HTML Formatting Variance**
 
 **Issue:** Different sites structure HTML differently, resulting in varied spacing in archived documents (some overly spaced, some too compressed).
 
@@ -462,7 +443,7 @@ Manually copy job description text and paste into a Google Doc in the "Job Searc
 **Accounts Required:**
 - ChatGPT Plus ($20/month) - for Phase 1 memory and usage
 - N8N Cloud ($25/month) OR self-hosted N8N (free)
-- OpenAI API account ($5-10 initial credits)
+- OpenAI API account ($5-10 initial credits) https://platform.openai.com/api-keys 
 - Google Workspace account (free Gmail works)
 
 **Technical Skills:**
@@ -494,34 +475,138 @@ Manually copy job description text and paste into a Google Doc in the "Job Searc
 - Format "Apply?" column as checkbox
 - Optional: Add conditional formatting for Interview Request
 
-### Phase 2 Setup (2-3 hours)
+## Phase 2: Complete Automation
 
-**Part 1: Evaluation Automation (1.5-2 hours)**
+### Part 1: Job Evaluation & Logging Automation
 
-**Prerequisites:**
-1. Sign up for N8N (cloud or self-hosted)
-2. Get OpenAI API key: https://platform.openai.com/api-keys
-3. Load $5-10 in OpenAI credits
+**Workflow:** 8 nodes, fully automated from URL to archive
 
-**Steps:**
-1. Import workflow template (available in `/workflows` folder) OR build from scratch following node configuration guide
-2. Configure OpenAI credential with API key
-3. Connect Google account (OAuth setup for Sheets and Docs)
-4. Create "Job Search Intelligence" folder in Google Drive
-5. Configure Google Sheets node to point to your tracking spreadsheet
-6. Test with sample job URL
-7. Verify data appears in Sheet and Doc is created
+#### Node-by-Node Breakdown
 
-**Part 2: Email Monitoring (30-45 minutes)**
+**1. Form Trigger (n8n Form)**
+- User submits job posting URL via web form
+- Accessible from any device via bookmark
+- Single required field: `Job_Link`
 
-**Steps:**
-1. Create new N8N workflow: "Email Monitor"
-2. Add Gmail trigger with polling interval (recommended: 6 hours)
-3. Configure search filters (see Email Monitoring section for syntax)
-4. Add Code node for email parsing (template in `/workflows` folder)
-5. Configure Switch node with rejection/interview conditions
-6. Add Google Sheets Get/Update nodes for both paths
-7. Test by forwarding old application emails to trigger processing
+**2. HTTP Request**
+- Fetches job posting content from submitted URL
+- Retrieves complete HTML including job description, requirements, company info
+- Output: `data` field containing raw HTML
+
+**3. AI Analysis (OpenAI - Message a Model)**
+- **Model:** GPT-4o-mini (optimal cost/performance)
+- **System Prompt:** Complete evaluation framework including:
+  - Candidate background summary
+  - 13 resume profile descriptions
+  - 10-point evaluation criteria
+  - JSON output requirements for data logging
+- **User Prompt:** Raw job posting HTML from HTTP Request
+- **Output:** Full narrative analysis + structured JSON block labeled "DATA FOR LOGGING"
+
+**4. JSON Extraction (Code - JavaScript)**
+- Parses OpenAI response text
+- Extracts JSON block from "DATA FOR LOGGING" section using regex
+- Converts to structured JavaScript object
+- **Output fields:** `company_name`, `job_title`, `location`, `resume_match`, `resume_fit_score`, `ats_fit_score`, `overall_fit_score`, `apply_recommendation`, `salary_range`, `capabilities_statement`, `risk_level`, `date_analyzed`
+
+**5. Google Sheets Logging (Append Row)**
+- Connects to "Job Application Tracking" spreadsheet
+- Maps JSON fields to spreadsheet columns
+- Appends new row with all evaluation data
+- Checkbox field for "Apply?" based on recommendation
+
+**6. HTML Cleaning (Code - JavaScript)**
+- Strips `<script>` and `<style>` tags
+- Removes all HTML markup
+- Decodes HTML entities (`&nbsp;`, `&amp;`, etc.)
+- Adds line breaks after block elements (`<p>`, `<div>`, `<h1>`, etc.)
+- Normalizes excessive whitespace
+- **Output:** `cleanJobDescription` - human-readable text suitable for Google Docs
+
+**7. Google Docs Creation (Create Document)**
+- Creates empty document in "Job Search Intelligence" folder
+- **Title format:** `[Company Name] - [Job Title]`
+- Returns document ID for next step
+
+**8. Google Docs Update (Update Document)**
+- Takes document ID from previous node
+- Inserts cleaned job description into document body
+- Archives complete job posting for interview preparation
+
+#### Data Flow Diagram
+
+```mermaid
+flowchart LR
+    A[Job URL] --> B[Fetch HTML]
+    B --> C[AI Analysis]
+    C --> D[Extract JSON]
+    D --> E[Log to Sheets]
+    D --> F[Clean HTML]
+    F --> G[Create Doc]
+    G --> H[Insert Content]
+```
+
+### Part 2: Email Monitoring Automation
+
+**Workflow:** 5 nodes with conditional branching, runs every 6 hours
+
+#### Node-by-Node Breakdown
+
+**1. Gmail Trigger (On Message Received)**
+- **Polling Frequency:** Every 6 hours (4x daily)
+- **Filters:**
+  - Subject contains: application, interview, position, opportunity, candidate, schedule, "next steps"
+  - From ATS systems: Greenhouse, Lever, Workable, Workday, Ashby, Rippling, SmartRecruiters, iCIMS
+  - Excludes: LinkedIn alerts, Indeed alerts, Glassdoor, ZipRecruiter
+- **Includes:** Spam/trash (catches legitimate emails mislabeled)
+
+**2. Email Parser (Code - JavaScript)**
+Extracts and structures email data:
+- **Email date:** Converts to MM-DD-YYYY format
+- **ATS system:** Identifies from sender domain and email body (falls back to "Unknown")
+- **Email type detection:**
+  - **Rejection keywords:** "unfortunately," "not moving forward," "decided to pursue," "position filled"
+  - **Interview keywords:** "schedule," "interview," "available for," "next steps," "speak with"
+- **Company name extraction:** Parses from subject/body
+- **Job title extraction:** Parses from subject/body
+- **Output:** Structured JSON with `atsSystem`, `companyName`, `jobTitle`, `isRejection`, `isInterview`, `emailDate`
+
+**3. Switch Node (Conditional Routing)**
+Two conditions evaluated:
+- **Path 1:** `isRejection === true`
+- **Path 2:** `isInterview === true`
+- **No match:** Email stops here (expected for job alerts that passed initial filters)
+
+**4. Rejection Path (2 nodes)**
+- **Get Rows (Google Sheets):** Finds matching application
+  - Filter: `Company Name = {{company}}` AND `Job Title = {{jobTitle}}`
+  - Why two nodes: Google Sheets Update only allows single-column matching; Get Rows enables multi-column filter
+- **Update Row (Google Sheets):** Sets `Date Rejected = {{emailDate}}`
+
+**5. Interview Path (2-3 nodes)**
+- **Get Rows (Google Sheets):** Finds matching application by company + job title
+- **Update Row (Google Sheets):** Sets `Interview Request = TRUE` (checkbox) and `Interview Contact Date = {{emailDate}}`
+- **Optional Enhancement:** Add Gmail label "🎯 Interview Request" via additional node for visual inbox flagging
+
+#### Email Processing Diagram
+
+```mermaid
+flowchart TD
+    A[Gmail Monitor] --> B[Parse Email]
+    B --> C{Email Type?}
+    C -->|Rejection| D[Find Row]
+    C -->|Interview| E[Find Row]
+    C -->|Neither| F[Stop - Job Alert]
+    D --> G[Update: Date Rejected]
+    E --> H[Update: Interview Request + Date]
+```
+
+### Integration Points
+
+Both workflows write to the same Google Sheet:
+- **Part 1** creates new rows (applications)
+- **Part 2** updates existing rows (outcomes)
+- Shared columns: Company Name, Job Title (used for matching)
 
 ### Data Schema
 
