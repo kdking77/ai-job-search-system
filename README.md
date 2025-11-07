@@ -30,9 +30,9 @@
     - [Sample Analysis Queries](#sample-analysis-queries)
     - [Insights to Extrac](#insights-to-extract)
 - [For Different Audiences](#for-different-audiences)
-    - [For Employers](#for-employers)
-    - [For Operations, Support, & Enablement Professionals](#for-operations-support--enablement-professionals)
-    - [For Career Coaches & Job Seekers](#for-career-coaches--job-seekers)
+    - [For Employers](#-for-employers)
+    - [For Operations, Support, & Enablement Professionals](#-for-operations-support--enablement-professionals)
+    - [For Career Coaches & Job Seekers](#-for-career-coaches--job-seekers)
 -[Repository Structure](#repository-structure) 
 
 ---
