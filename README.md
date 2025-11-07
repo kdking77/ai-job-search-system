@@ -828,19 +828,19 @@ Built by a support operations professional who understands:
 
 ## Changelog
 
-**v2.0** (November 2024)
+**v2.0** (November 2025)
 - ✅ Added Phase 2 Part 2 (email monitoring)
 - ✅ Interview request tracking
 - ✅ ATS system identification
 - ✅ Conditional formatting recommendations
 
-**v1.5** (November 2024)
+**v1.5** (November 2025)
 - ✅ Added Phase 2 Part 1 (evaluation automation)
 - ✅ Google Docs archiving
 - ✅ HTML cleaning improvements
 - ✅ Discovered 8.8+ optimal threshold
 
-**v1.0** (October 2024)
+**v1.0** (January 2025)
 - ✅ Phase 1 complete (prompt engineering)
 - ✅ 13 resume profiles integrated
 - ✅ 10-point evaluation framework
