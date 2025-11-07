@@ -59,6 +59,11 @@ This system addresses all of these issues:
 - [Skills Demonstrated](#skills-demonstrated)
 - [Limitations & Workarounds](#limitations--workarounds)
 - [Setup Guide](#setup-guide)
+    -[Prerequisites](#prerequisites)
+    -[Phase 1 Setup (15-20 minutes)](##phase-1-setup-15-20-minutes)
+    -[Phase 2:Complete Automation](##phase-2-complete-automation-1)
+        -[Part 1:Job Evaluation & Logging Automation](#part-1-job-evaluation--logging-automation-1)
+        -[Part 2: Email Monitoring Automation](#part-2-email-monitoring-automation-1)
 - [Data & Insights](#data--insights)
 - [For Different Audiences](#for-different-audiences)
 
