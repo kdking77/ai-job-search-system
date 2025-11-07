@@ -637,40 +637,75 @@ Both workflows write to the same Google Sheet:
 
 ### Metrics You Can Track
 
-**Application Quality:**
-- Callback rate by score bracket
-- Interview conversion by resume type
-- Salary accuracy (predicted vs. actual offers)
+**Application Quality**
+- Callback rate by score bracket (Overall Fit score vs. interview requests)
+- Interview conversion by resume type (which of 13 resume profiles generates callbacks)
+- Score threshold validation (does 8.8+ actually correlate with better outcomes?)
+- Salary accuracy (predicted range vs. actual offers when negotiating)
 
-**Process Efficiency:**
-- Time saved per application (baseline vs. automated)
-- Applications per week (sustainable volume)
-- Decision quality (regretted applications)
+**Pattern Recognition (Actionable)**
+- Day-of-week rejection clusters (e.g., Wed/Thu patterns discovered)
+- Resume-specific rejection patterns (which types get filtered out)
+- Gap identification (e.g., consistent rejections for specific role types revealing missing requirements)
+- ATS system behavior patterns (which systems auto-reject fastest, user experience differences)
+- Time-to-rejection by job type/ATS (fast = automated screening; slow = human review reached)
 
-**Market Intelligence:**
-- Rejection timing patterns (day of week, time from application)
-- ATS system performance (speed, user experience, rejection rates)
-- Industry/role-specific trends
+**Strategic Optimization**
+- Most effective resume profiles (which generate highest interview rates)
+- Mitigation strategy effectiveness (do upsell statements/capabilities statements help?)
+- Job characteristic predictors (company size, location, industry correlations)
+- Score threshold refinement (adjusting decision rules based on outcomes)
 
-**Strategic Insights:**
-- Which resume profiles generate most interviews
-- Score threshold accuracy (does 8.8+ really work best?)
-- Gap mitigation effectiveness (do upsell statements help?)
+**Market Reality (Informational - Can Be Demoralizing)**
+- Overall rejection rates
+- Applications per week/month
+- Average time-to-rejection (overall) - useful for expectation setting
+
+*Note: Volume and rate metrics reflect market conditions, not personal performance. Focus on actionable patterns that inform strategy adjustments.*
+
+---
 
 ### Sample Analysis Queries
 
 **In Google Sheets:**
 
 ```
-// Interview conversion by score
+// Interview conversion rate for high-scoring applications
 =COUNTIFS(G:G,">=8.8",O:O,TRUE) / COUNTIFS(G:G,">=8.8")
 
-// Average time to rejection by ATS
+// Average days to rejection by ATS system
 =AVERAGEIF(P:P,"Workday",N:N-L:L)
 
-// Most successful resume type
-=INDEX(D:D, MODE(MATCH(O:O,TRUE,0)))
+// Most successful resume type (mode of Interview Request = TRUE)
+=INDEX(D:D, MODE(IF(O:O=TRUE, MATCH(D:D,D:D,0))))
+
+// Rejection day-of-week distribution
+=COUNTIF(TEXT(N:N,"dddd"),"Wednesday")
 ```
+
+---
+
+### Insights to Extract
+
+**What's Working:**
+- Which resume profiles get callbacks at highest rates?
+- What Overall Fit scores reliably predict interviews?
+- Which capabilities statements correlate with positive outcomes?
+
+**What's Not Working:**
+- Are certain role types consistently rejecting despite high scores? (Indicates systematic gap)
+- Do specific ATS systems auto-reject? (Might indicate keyword/formatting issues)
+- Are low-scoring applications worth the time? (Validate threshold decisions)
+
+**Market Intelligence:**
+- How long does each ATS system typically take to respond?
+- Which companies/industries have fastest/slowest hiring processes?
+- When are rejections clustered? (Batch processing patterns)
+
+**Strategic Adjustments:**
+- Should you build a new resume category based on rejection patterns?
+- Do certain mitigation strategies (upsell statements) improve outcomes?
+- Are your score thresholds accurate or should they be adjusted?
 
 ---
 
