@@ -1,0 +1,446 @@
+{
+  "name": "Job Intelligence Workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Job Application Evaluator",
+        "formDescription": "Paste the job posting URL below to get an AI-powered fit analysis",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Job_Link",
+              "placeholder": "https://company.com/careers/job-posting",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.3,
+      "position": [
+        48,
+        -352
+      ],
+      "id": "b58b98a7-7408-4e19-b9e1-f10aa41408be",
+      "name": "On form submission",
+      "webhookId": "74c21f06-1538-4dce-a0f2-e098731bd905"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.Job_Link }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        0,
+        -128
+      ],
+      "id": "59906286-0d3d-4979-8c93-8a70d971cde0",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "responses": {
+          "values": [
+            {
+              "role": "system",
+              "content": "You are evaluating job postings for a candidate with 15+ years of experience in IT Support Operations, Application Support, Enablement, and Process Improvement.\n\nCANDIDATE BACKGROUND:\n- Leadership: Global support teams, cross-functional collaboration, stakeholder management\n- Technical: ServiceNow, ITIL, Lean Six Sigma, process automation, SLA/KPI optimization\n- Core Strengths: Incident management, knowledge governance, training/enablement, workflow redesign\n- Location: Houston, TX (open to remote or Houston/Chicago/Atlanta/Dallas offices)\n\nAVAILABLE RESUME PROFILES (13 specialized versions):\n\nLEADERSHIP/MANAGER LEVEL (Primary - Priority 4-5):\n1. Support Enablement Master - Team enablement, knowledge management, runbook governance, onboarding programs\n2. Application Support Master - Major incident response, escalation leadership, root cause analysis, ServiceNow expert\n3. IT Support Operations Master - Queue governance, shift models, escalation frameworks, SLA dashboards\n4. Process Improvement Master - Lean Six Sigma, workflow mapping, KPI reduction, automation, cycle time optimization\n5. Customer Support Lead - SLA management, coaching/mentoring, queue oversight, satisfaction improvement\n6. IT Training Master - Training program design, LMS/e-learning, SOP/runbook authoring, KCS programs\n7. Business Systems Master - Requirements/UAT, system enhancements, UI logic, data integrity, change adoption\n8. Implementation & Support Leader - Customer onboarding, UAT/launch, adoption programs, post-launch readiness\n\nSPECIALIZED VARIANTS (Priority 3-4):\n9. Customer Master Energy - Energy sector support (Upstream/LNG/Oil & Gas), geospatial/data taxonomy\n10. Technical Writer/Documentation Lead - Documentation governance, audit trails, standards, Confluence/Wikis\n\nANALYST/IC LEVEL (Priority 2-3):\n11. Analyst Master - IC-level analytics + support for roles below management (Excel, data validation, SQL basics)\n12. App Support Analyst v1 - Slim ATS-friendly for broad L2/IC applications (ticket triage, troubleshooting)\n13. App Support Analyst v2 - Energy/SaaS analyst variant with data workflows context\n\nEVALUATION FRAMEWORK:\nAnalyze the job posting using these 10 criteria:\n\n1. RESUME MATCH\n   - Identify which resume profile(s) best fit this role\n   - Explain alignment between job requirements and resume focus areas\n   - Note if role is leadership/manager vs. analyst/IC level\n\n2. ALIGNMENT STRENGTHS\n   - Map specific candidate experience to job requirements\n   - Highlight competitive advantages (certifications, industry experience, technical skills)\n   - Note direct experience matches (tools, methodologies, team scope)\n\n3. RISK FACTORS / WATCHOUTS\n   - Identify requirement gaps or misalignments\n   - Rate impact: Minor (easily mitigatable), Moderate (addressable with positioning), Major (potential deal-breaker)\n   - Suggest mitigation strategies for each gap\n\n4. TRI-SCORE EVALUATION (1-10 scale with justification):\n   - Resume Fit: Content alignment between candidate background and job requirements\n   - ATS Fit: Keyword density, terminology match for applicant tracking systems\n   - Overall Fit: Holistic assessment including culture signals, growth trajectory, strategic positioning\n\n5. APPLICATION RECOMMENDATION\n   - Should candidate apply? (Yes/No with clear reasoning)\n   - Factor in scores: 8.5+ Overall Fit = strong apply, unless critical requirements missing\n   - If <8.5 but worth applying, explain why (strategic opportunity, transferable skills, etc.)\n\n6. RESUME STRATEGY\n   - Does this require a new resume category not covered by existing 13?\n   - If yes: describe the new category and whether it's worth building given market demand\n   - If no: confirm which existing resume(s) provide adequate coverage\n\n7. LOCATION VERIFICATION\n   - Confirm: Remote eligible OR Houston/Chicago/Atlanta/Dallas location\n   - Flag if hybrid and specify expected office presence\n   - Highlight if location is non-acceptable (prevents wasted applications)\n\n8. SALARY INTELLIGENCE\n   - If range posted: predict realistic offer within range based on candidate's 15+ years experience\n   - If not posted: estimate based on role level, location (Houston market), industry, company size\n   - Explain reasoning: market data, experience premium, skill alignment, etc.\n\n9. CAPABILITIES STATEMENT\n   - For leadership/ownership roles (not bridge jobs): recommend whether to attach capabilities statement\n   - Candidate has capabilities statements for: Process Improvement, Training/Enablement, Team Leadership, Support Operations\n   - Explain which type would strengthen application and why\n\n10. STRATEGIC POSITIONING\n    - Classify role: Bridge job, lateral move, or advancement opportunity\n    - Assess long-term career trajectory alignment\n    - Consider market conditions and role sustainability\n\nOUTPUT FORMAT:\nStructure your analysis with clear headers for each criterion. Use tables for risk assessment. Be specific, actionable, and data-driven. Avoid generic statements—reference actual job requirements and candidate qualifications.\n\nCRITICAL OUTPUT REQUIREMENT:\nAfter providing your full narrative analysis above, you MUST also output a structured JSON object at the very end with the following fields for data logging:\n\n{\n  \"company_name\": \"string\",\n  \"job_title\": \"string\",\n  \"location\": \"string (city or 'Remote')\",\n  \"resume_match\": \"string (which resume profile)\",\n  \"resume_fit_score\": number (1-10),\n  \"ats_fit_score\": number (1-10),\n  \"overall_fit_score\": number (1-10),\n  \"apply_recommendation\": \"string (Yes/No with brief reason)\",\n  \"salary_range\": \"string (e.g., '$95K-$105K' or 'Estimated: $80K-$90K')\",\n  \"capabilities_statement\": \"string (which to attach, or 'None')\",\n  \"risk_level\": \"string (Low/Moderate/High based on gaps)\",\n  \"date_analyzed\": \"string (today's date in YYYY-MM-DD format)\"\n}\n\nPlace this JSON block at the very end of your response after all narrative analysis, clearly labeled as \"DATA FOR LOGGING:\""
+            },
+            {
+              "content": "={{ $json.data }}"
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2,
+      "position": [
+        192,
+        -128
+      ],
+      "id": "9afe82ad-1fa2-4411-a80c-7b4bb208f5c2",
+      "name": "Message a model",
+      "credentials": {
+        "openAiApi": {
+          "id": "rEAxhFj1E5fWKkRM",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get the OpenAI response text from the correct location\nconst text = $input.item.json.output[0].content[0].text;\n\n// Extract the JSON from the \"DATA FOR LOGGING:\" section\nconst jsonMatch = text.match(/DATA FOR LOGGING:[\\s\\S]*?```json\\s*([\\s\\S]*?)\\s*```/);\n\nif (jsonMatch && jsonMatch[1]) {\n  // Parse the JSON\n  const jobData = JSON.parse(jsonMatch[1]);\n  \n  // Return it as structured data\n  return { json: jobData };\n} else {\n  throw new Error('Could not find JSON data in response');\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        544,
+        -128
+      ],
+      "id": "a6742222-78dd-499c-9e47-3d70016afddc",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1r0fTT77tCIaf3tOPav1Mg3FaevZJhyy1QdtUnYnjtG4",
+          "mode": "list",
+          "cachedResultName": "Job Application Tracking",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1r0fTT77tCIaf3tOPav1Mg3FaevZJhyy1QdtUnYnjtG4/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1r0fTT77tCIaf3tOPav1Mg3FaevZJhyy1QdtUnYnjtG4/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Company Name": "={{ $json.company_name }}",
+            "Job Title": "={{ $json.job_title }}",
+            "Location": "={{ $json.location }}",
+            "Resume Match": "={{ $json.resume_match }}",
+            "Resume Fit": "={{ $json.resume_fit_score }}",
+            "ATS Fit": "={{ $json.ats_fit_score }}",
+            "Overall Fit": "={{ $json.overall_fit_score }}",
+            "Apply?": "={{ $json.apply_recommendation === 'Yes' }}",
+            "Salary Range": "={{ $json.salary_range }}",
+            "Capabilities": "={{ $json.capabilities_statement }}",
+            "Risk Level": "={{ $json.risk_level }}",
+            "Date Analyzed": "={{ $json.date_analyzed }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Company Name",
+              "displayName": "Company Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Job Title",
+              "displayName": "Job Title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Location",
+              "displayName": "Location",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Resume Match",
+              "displayName": "Resume Match",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Resume Fit",
+              "displayName": "Resume Fit",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "ATS Fit",
+              "displayName": "ATS Fit",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Overall Fit",
+              "displayName": "Overall Fit",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Apply?",
+              "displayName": "Apply?",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Salary Range",
+              "displayName": "Salary Range",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Capabilities",
+              "displayName": "Capabilities",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Risk Level",
+              "displayName": "Risk Level",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Date Analyzed",
+              "displayName": "Date Analyzed",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Date Applied",
+              "displayName": "Date Applied",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Date Rejected ",
+              "displayName": "Date Rejected ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "ATS System",
+              "displayName": "ATS System",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Notes",
+              "displayName": "Notes",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        752,
+        -128
+      ],
+      "id": "92539caf-ea73-46ba-a3f1-b6cf0b95ad2e",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "qEss0fCXYq39tiiZ",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get the raw HTML from HTTP Request\nconst rawHtml = $('HTTP Request').item.json.data;\n\n// Clean the HTML with better paragraph preservation\nlet cleanText = rawHtml\n  // Remove script tags and content\n  .replace(/<script\\b[^<]*(?:(?!<\\/script>)<[^<]*)*<\\/script>/gi, '')\n  // Remove style tags and content\n  .replace(/<style\\b[^<]*(?:(?!<\\/style>)<[^<]*)*<\\/style>/gi, '')\n  // Add newlines after block elements BEFORE removing tags\n  .replace(/<\\/(p|div|h1|h2|h3|h4|h5|h6|li|tr|br)>/gi, '\\n')\n  .replace(/<br\\s*\\/?>/gi, '\\n')\n  // Remove all HTML tags\n  .replace(/<[^>]+>/g, '')\n  // Decode HTML entities\n  .replace(/&nbsp;/g, ' ')\n  .replace(/&amp;/g, '&')\n  .replace(/&lt;/g, '<')\n  .replace(/&gt;/g, '>')\n  .replace(/&quot;/g, '\"')\n  .replace(/&#39;/g, \"'\")\n  // Clean up whitespace\n  .replace(/\\s*\\n\\s*/g, '\\n')  // Normalize newlines\n  .replace(/\\n{3,}/g, '\\n\\n')  // Max 2 consecutive newlines\n  .replace(/  +/g, ' ')        // Multiple spaces to single space\n  .replace(/^\\s+/gm, '')       // Remove leading spaces\n  .trim();\n\n// Get data from previous node\nconst previousData = $input.item.json;\n\n// Return the clean text plus all previous data\nreturn { \n  json: {\n    ...previousData,\n    cleanJobDescription: cleanText\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        944,
+        -128
+      ],
+      "id": "c0d8f934-191e-4c07-acf2-1685bcf5a0c5",
+      "name": "Clean HTML for Google Doc"
+    },
+    {
+      "parameters": {
+        "folderId": "1ESm1sHFmWIEHkzeAW0MOnTwDnvYEEMCv",
+        "title": "={{ $json['Job Title'] }} - {{ $json['Company Name'] }} "
+      },
+      "type": "n8n-nodes-base.googleDocs",
+      "typeVersion": 2,
+      "position": [
+        1136,
+        -112
+      ],
+      "id": "95a5db13-20f6-42f8-af95-2331041aa140",
+      "name": "Create the google doc",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "98WXZ8YHiWRQCZhK",
+          "name": "Google Docs account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentURL": "={{ $json.id }}",
+        "actionsUi": {
+          "actionFields": [
+            {
+              "action": "insert",
+              "text": "={{ $('Clean HTML for Google Doc').item.json.cleanJobDescription }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.googleDocs",
+      "typeVersion": 2,
+      "position": [
+        1104,
+        112
+      ],
+      "id": "9b737385-017d-44fd-ab52-bbbf6382373d",
+      "name": "Add Job Description to google doc",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "98WXZ8YHiWRQCZhK",
+          "name": "Google Docs account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Clean HTML for Google Doc",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Clean HTML for Google Doc": {
+      "main": [
+        [
+          {
+            "node": "Create the google doc",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create the google doc": {
+      "main": [
+        [
+          {
+            "node": "Add Job Description to google doc",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "60bfbd60-b1be-467d-9448-7f084cee12a4",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "0b39f7f68862d859d9b7bd8e53d19e5c23e5a57a5f71f99a1fbf539d6c447161"
+  },
+  "id": "p4VgFjVAfwtMXLaV",
+  "tags": []
+}
