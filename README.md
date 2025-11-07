@@ -53,6 +53,7 @@ This system addresses all of these issues:
 - [What It Does](#what-it-does)
 - [Phase 1: Prompt Engineering Framework](#phase-1-prompt-engineering-framework)
 - [Phase 2: Complete Automation](#phase-2-complete-automation)
+    - [Part 2: Email Monitoring Automation] (#part-2-email-monitoring-automation)
 - [Example Output](#example-output)
 - [Skills Demonstrated](#skills-demonstrated)
 - [Limitations & Workarounds](#limitations--workarounds)
