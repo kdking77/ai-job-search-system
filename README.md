@@ -33,7 +33,10 @@
     - [For Employers](#-for-employers)
     - [For Operations, Support, & Enablement Professionals](#-for-operations-support--enablement-professionals)
     - [For Career Coaches & Job Seekers](#-for-career-coaches--job-seekers)
--[Repository Structure](#repository-structure) 
+- [Repository Structure](#repository-structure)
+- [About This System](#about-this-system)
+- [Connect & Contribute](#connect--contribute)
+- [Changelog](#changelog)
 
 ---
 
