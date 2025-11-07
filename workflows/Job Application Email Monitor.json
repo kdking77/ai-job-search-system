@@ -1,0 +1,726 @@
+{
+  "name": "Job Application Email Monitor",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyX",
+              "value": 6
+            }
+          ]
+        },
+        "filters": {
+          "includeSpamTrash": true,
+          "q": "=(subject:(application OR interview OR position OR opportunity OR candidate OR schedule OR \"next steps\" OR \"thank you for applying\") OR from:(*@greenhouse.io OR *@lever.co OR *@jobs.lever.co OR *@workablemail.com OR *@myworkday.com OR *@ashbyhq.com OR *@ats.rippling.com OR *@rippling.com OR *@smartrecruiters.com OR *@talent.icims.com OR *@icims.com)) -from:(*@linkedin.com OR *@indeed.com OR *@glassdoor.com OR *@ziprecruiter.com OR *@job-search-digest OR *@jobalerts)"
+        }
+      },
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -496,
+        -416
+      ],
+      "id": "2cdb4e91-7a24-4d72-b291-ad9f88ea2f31",
+      "name": "Gmail Trigger",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "fAA0pTyKxTmg0V2E",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1r0fTT77tCIaf3tOPav1Mg3FaevZJhyy1QdtUnYnjtG4",
+          "mode": "list",
+          "cachedResultName": "Job Application Tracking",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1r0fTT77tCIaf3tOPav1Mg3FaevZJhyy1QdtUnYnjtG4/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1r0fTT77tCIaf3tOPav1Mg3FaevZJhyy1QdtUnYnjtG4/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Company Name",
+              "lookupValue": "={{ $json.companyName }}"
+            },
+            {
+              "lookupColumn": "Job Title",
+              "lookupValue": "={{ $json.jobTitle }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        256,
+        -416
+      ],
+      "id": "b1b198ad-9015-4eb9-9a14-6ff764733b87",
+      "name": "Find Match in GSheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "qEss0fCXYq39tiiZ",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get email data from Gmail trigger - FIXED: using capitalized field names\nconst subject = $input.item.json.Subject || '';\nconst snippet = $input.item.json.snippet || '';\nconst from = $input.item.json.From || '';\nconst internalDate = $input.item.json.internalDate;\n\n// Convert internalDate to MM-DD-YYYY format\nlet emailDate = new Date().toISOString(); // default to today\nif (internalDate) {\n  const date = new Date(parseInt(internalDate));\n  const month = String(date.getMonth() + 1).padStart(2, '0');\n  const day = String(date.getDate()).padStart(2, '0');\n  const year = date.getFullYear();\n  emailDate = `${month}-${day}-${year}`;\n} else {\n  const date = new Date();\n  const month = String(date.getMonth() + 1).padStart(2, '0');\n  const day = String(date.getDate()).padStart(2, '0');\n  const year = date.getFullYear();\n  emailDate = `${month}-${day}-${year}`;\n}\n\n// Extract ATS System - check BOTH sender domain AND email content\nlet atsSystem = 'Unknown';\n\n// First, check sender domain (FIXED: workday pattern)\nconst atsDomains = {\n  'greenhouse.io': 'Greenhouse',\n  'lever.co': 'Lever',\n  'jobs.lever.co': 'Lever',\n  'workablemail.com': 'Workable',\n  'workday': 'Workday',  // FIXED: catches myworkday.com and others\n  'ashbyhq.com': 'Ashby',\n  'ats.rippling.com': 'Rippling',\n  'rippling.com': 'Rippling',\n  'smartrecruiters.com': 'SmartRecruiters',\n  'talent.icims.com': 'iCIMS',\n  'icims.com': 'iCIMS'\n};\n\nfor (const [domain, name] of Object.entries(atsDomains)) {\n  if (from.toLowerCase().includes(domain)) {\n    atsSystem = name;\n    break;\n  }\n}\n\n// If not found in domain, check email snippet/subject for ATS mentions\nif (atsSystem === 'Unknown') {\n  const fullText = (subject + ' ' + snippet).toLowerCase();\n  \n  const atsPatterns = {\n    'Greenhouse': ['greenhouse'],\n    'Lever': ['lever'],\n    'Workable': ['workable'],\n    'Workday': ['workday'],\n    'Ashby': ['ashby'],\n    'Rippling': ['rippling', 'ripplehire', 'powered by rippling'],\n    'SmartRecruiters': ['smartrecruiters'],\n    'iCIMS': ['icims'],\n    'Oracle': ['oracle taleo', 'oracle cloud', 'taleo'],\n    'Paylocity': ['paylocity'],\n    'Jobvite': ['jobvite'],\n    'UltiPro': ['ultipro', 'ukg'],\n    'BambooHR': ['bamboohr'],\n    'Jazz': ['jazz hr', 'jazzhr'],\n    'Breezy': ['breezy hr', 'breezyhr'],\n    'Recruiterbox': ['recruiterbox'],\n    'Apply4U': ['apply4u'],\n    'Fountain': ['fountain'],\n    'Namely': ['namely']\n  };\n  \n  for (const [ats, patterns] of Object.entries(atsPatterns)) {\n    if (patterns.some(pattern => fullText.includes(pattern))) {\n      atsSystem = ats;\n      break;\n    }\n  }\n}\n\n// Detect email type\nconst rejectionKeywords = ['unfortunately', 'not moving forward', 'decided to pursue', 'filled the position', 'will not be moving forward', 'not be moving forward', 'have decided', 'other candidates', 'position you applied for has been'];\nconst interviewKeywords = ['schedule', 'interview', 'next steps', 'available for a call', 'like to speak', 'coordinate a time', 'set up a time'];\n\nconst fullText = (subject + ' ' + snippet).toLowerCase();\nconst isRejection = rejectionKeywords.some(keyword => fullText.includes(keyword));\nconst isInterview = interviewKeywords.some(keyword => fullText.includes(keyword));\n\n// Extract company name - improved patterns\nlet companyName = 'Unknown';\nconst companyPatterns = [\n  /application to ([A-Z][A-Za-z0-9\\s&.,]+?) for/i,  // \"application to [Company] for\"\n  /(?:at|from|with|to)\\s+([A-Z][A-Za-z0-9\\s&]+?)(?:\\s+(?:team|regarding|for|about|application)|$)/i,\n  /^([A-Z][A-Za-z0-9\\s&]+?)(?:\\s+[-–—]|\\s+application|\\s+job)/i  // Company at start of subject\n];\n\nfor (const pattern of companyPatterns) {\n  const match = subject.match(pattern) || snippet.match(pattern);\n  if (match && match[1]) {\n    companyName = match[1].trim();\n    // Clean up common trailing words\n    companyName = companyName.replace(/\\s+(team|application|job|position|role)$/i, '');\n    break;\n  }\n}\n\n// Extract job title - improved patterns\nlet jobTitle = 'Unknown';\nconst titlePatterns = [\n  /for the ([A-Z][A-Za-z0-9\\s\\-\\/&]+?) position/i,  // \"for the [Title] position\"\n  /(?:for|as)\\s+(?:the\\s+)?([A-Z][A-Za-z0-9\\s\\-\\/&]+?)(?:\\s+position|\\s+role|$)/i,\n  /application.*?(?:for|as|to)\\s+([A-Z][A-Za-z0-9\\s\\-\\/]+)/i\n];\n\nfor (const pattern of titlePatterns) {\n  const match = subject.match(pattern) || snippet.match(pattern);\n  if (match && match[1]) {\n    jobTitle = match[1].trim();\n    // Clean up common trailing words\n    jobTitle = jobTitle.replace(/\\s+(position|role|at|with)$/i, '');\n    break;\n  }\n}\n\n// Return structured data\nreturn {\n  json: {\n    atsSystem: atsSystem,\n    companyName: companyName,\n    jobTitle: jobTitle,\n    isRejection: isRejection,\n    isInterview: isInterview,\n    emailDate: emailDate,\n    rawSubject: subject,\n    rawSnippet: snippet.substring(0, 500),\n    rawFrom: from\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -240,
+        -304
+      ],
+      "id": "22cd58f5-fcf4-4d30-9c8f-cd94c3291a79",
+      "name": "Code in JavaScript to extract and label data"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.isRejection }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "true",
+                      "singleValue": true
+                    },
+                    "id": "545cb53d-b186-44b9-8ff8-0c46f9ec1a3c"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Rejection"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "af488cd9-5ebd-4916-8abf-1b9f9cb7a942",
+                    "leftValue": "={{ $json.isInterview }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "true",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Interview"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.3,
+      "position": [
+        -16,
+        -304
+      ],
+      "id": "cd607a89-91c2-4f4c-9dc2-c904d28de023",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1r0fTT77tCIaf3tOPav1Mg3FaevZJhyy1QdtUnYnjtG4",
+          "mode": "list",
+          "cachedResultName": "Job Application Tracking",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1r0fTT77tCIaf3tOPav1Mg3FaevZJhyy1QdtUnYnjtG4/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1r0fTT77tCIaf3tOPav1Mg3FaevZJhyy1QdtUnYnjtG4/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Date Rejected ": "={{ $('Switch').item.json.emailDate }}",
+            "Company Name": "={{ $json['Company Name'] }}"
+          },
+          "matchingColumns": [
+            "Company Name"
+          ],
+          "schema": [
+            {
+              "id": "Company Name",
+              "displayName": "Company Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Job Title",
+              "displayName": "Job Title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Location",
+              "displayName": "Location",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Resume Match",
+              "displayName": "Resume Match",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Resume Fit",
+              "displayName": "Resume Fit",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "ATS Fit",
+              "displayName": "ATS Fit",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Overall Fit",
+              "displayName": "Overall Fit",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Apply?",
+              "displayName": "Apply?",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Salary Range",
+              "displayName": "Salary Range",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Capabilities",
+              "displayName": "Capabilities",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Risk Level",
+              "displayName": "Risk Level",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Date Analyzed",
+              "displayName": "Date Analyzed",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Date Applied",
+              "displayName": "Date Applied",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Date Rejected ",
+              "displayName": "Date Rejected ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "ATS System",
+              "displayName": "ATS System",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Notes",
+              "displayName": "Notes",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Interview Request",
+              "displayName": "Interview Request",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Interview Contact Date",
+              "displayName": "Interview Contact Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        544,
+        -400
+      ],
+      "id": "cd78ada2-fa74-494e-9581-32dfbedaeb5d",
+      "name": "Update row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "qEss0fCXYq39tiiZ",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1r0fTT77tCIaf3tOPav1Mg3FaevZJhyy1QdtUnYnjtG4",
+          "mode": "list",
+          "cachedResultName": "Job Application Tracking",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1r0fTT77tCIaf3tOPav1Mg3FaevZJhyy1QdtUnYnjtG4/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1r0fTT77tCIaf3tOPav1Mg3FaevZJhyy1QdtUnYnjtG4/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Company Name",
+              "lookupValue": "={{ $('Code in JavaScript to extract and label data').item.json.companyName }}"
+            },
+            {
+              "lookupColumn": "Job Title",
+              "lookupValue": "={{ $('Code in JavaScript to extract and label data').item.json.jobTitle }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        240,
+        -176
+      ],
+      "id": "8f39883d-e24f-4f81-bdf2-ee9a5de01565",
+      "name": "Get row(s) in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "qEss0fCXYq39tiiZ",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1r0fTT77tCIaf3tOPav1Mg3FaevZJhyy1QdtUnYnjtG4",
+          "mode": "list",
+          "cachedResultName": "Job Application Tracking",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1r0fTT77tCIaf3tOPav1Mg3FaevZJhyy1QdtUnYnjtG4/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1r0fTT77tCIaf3tOPav1Mg3FaevZJhyy1QdtUnYnjtG4/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Company Name": "={{ $('Code in JavaScript to extract and label data').item.json.companyName }}",
+            "Interview Request": "={{ $('Code in JavaScript to extract and label data').item.json.isInterview }}",
+            "Interview Contact Date": "={{ $('Code in JavaScript to extract and label data').item.json.emailDate }}"
+          },
+          "matchingColumns": [
+            "Company Name"
+          ],
+          "schema": [
+            {
+              "id": "Company Name",
+              "displayName": "Company Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Job Title",
+              "displayName": "Job Title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Location",
+              "displayName": "Location",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Resume Match",
+              "displayName": "Resume Match",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Resume Fit",
+              "displayName": "Resume Fit",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "ATS Fit",
+              "displayName": "ATS Fit",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Overall Fit",
+              "displayName": "Overall Fit",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Apply?",
+              "displayName": "Apply?",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Salary Range",
+              "displayName": "Salary Range",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Capabilities",
+              "displayName": "Capabilities",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Risk Level",
+              "displayName": "Risk Level",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Date Analyzed",
+              "displayName": "Date Analyzed",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Date Applied",
+              "displayName": "Date Applied",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Date Rejected ",
+              "displayName": "Date Rejected ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "ATS System",
+              "displayName": "ATS System",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Notes",
+              "displayName": "Notes",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Interview Request",
+              "displayName": "Interview Request",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Interview Contact Date",
+              "displayName": "Interview Contact Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        496,
+        -160
+      ],
+      "id": "0057e8f3-2ccd-4d4d-b89b-9a52f31e46ba",
+      "name": "Update row in sheet1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "qEss0fCXYq39tiiZ",
+          "name": "Google Sheets account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Gmail Trigger": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript to extract and label data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript to extract and label data": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Find Match in GSheets",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Find Match in GSheets": {
+      "main": [
+        [
+          {
+            "node": "Update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "Update row in sheet1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "ec5d9e5d-aed1-4234-b397-2ce4131e0b9b",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "0b39f7f68862d859d9b7bd8e53d19e5c23e5a57a5f71f99a1fbf539d6c447161"
+  },
+  "id": "NH95p0dQKzzrbbo7",
+  "tags": []
+}
