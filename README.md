@@ -814,24 +814,19 @@ This project demonstrates how process improvement thinking translates to no-code
 
 ```
 ai-job-search-system/
-├── README.md (this file)
+├── README.md (complete documentation)
 ├── prompts/
-│   ├── job-evaluation-prompt.md (Phase 1 - evaluation framework)
-│   └── application-questions-prompt.md (Phase 1 - question responses)
+│   ├── job-evaluation-prompt.md (Phase 1 - 10-point evaluation framework with annotations)
+│   └── application-questions-prompt.md (Phase 1 - response drafting and scoring system)
 ├── workflows/
-│   ├── job-evaluation-automation.json (N8N export - Workflow 1)
-│   └── email-monitoring.json (N8N export - Workflow 2)
-├── scripts/
-│   ├── json-extractor.js (Code node - extract AI response)
-│   ├── html-cleaner.js (Code node - clean job descriptions)
-│   └── email-parser.js (Code node - parse Gmail data)
-├── examples/
-│   ├── high-fit-analysis.md (9.4/10 score example)
-│   └── spreadsheet-sample.csv (anonymized tracking data)
-└── docs/
-    ├── setup-guide.md (detailed installation instructions)
-    ├── troubleshooting.md (common issues and solutions)
-    └── metrics-guide.md (how to analyze your data)
+│   ├── job-evaluation-automation.json (N8N export - Workflow 1: evaluation and logging)
+│   ├── email-monitoring.json (N8N export - Workflow 2: rejection and interview tracking)
+│   ├── Job Evaluation Workflow.PNG (visual reference - 8-node workflow diagram)
+│   └── Email Monitoring Workflow.PNG (visual reference - 7-node workflow with branching)
+└── scripts/
+    ├── json-extractor.js (Code node - extracts structured data from AI response)
+    ├── html-cleaner.js (Code node - cleans HTML for Google Docs archiving)
+    └── email-parser.js (Code node - parses Gmail data and identifies email type)
 ```
 
 ---
