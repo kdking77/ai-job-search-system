@@ -861,7 +861,7 @@ Built by a support operations professional who understands:
 - ✅ HTML cleaning improvements
 - ✅ Discovered 8.8+ optimal threshold
 
-**v1.0** (January 2025)
+**v1.0** (March 2025)
 - ✅ Phase 1 complete (prompt engineering)
 - ✅ 13 resume profiles integrated
 - ✅ 10-point evaluation framework
@@ -870,6 +870,6 @@ Built by a support operations professional who understands:
 ---
 
 **License:** MIT (free for personal/educational use)  
-**Last Updated:** November 2024  
+**Last Updated:** November 2025  
 **Version:** 2.0 - Complete Automation System
 **License**: MIT (educational/personal use)
