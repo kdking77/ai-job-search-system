@@ -6,7 +6,38 @@
 
 ---
 
-## Why This Exists
+## Table of Contents
+
+- [Background](#background)
+- [System Overview](#system-overview)
+- [What It Does](#what-it-does)
+- [Phase 1: Prompt Engineering Framework](#phase-1-prompt-engineering-framework)
+- [Phase 2: Complete Automation](#phase-2-complete-automation)
+    - [Part 1: Job Evaluation & Logging Automation](#part-1-job-evaluation--logging-automation)
+    - [Part 2: Email Monitoring Automation](#part-2-email-monitoring-automation)
+- [Example Output](#example-output)
+- [Skills Demonstrated](#skills-demonstrated)
+- [Limitations & Workarounds](#limitations--workarounds)
+- [Setup Guide](#setup-guide)
+    - [Prerequisites](#prerequisites)
+    - [Phase 1 Setup (15-20 minutes)](#phase-1-setup-15-20-minutes)
+    - [Phase 2:Complete Automation](#phase-2-complete-automation-1)
+        - [Part 1:Job Evaluation & Logging Automation](#part-1-job-evaluation--logging-automation-1)
+        - [Part 2: Email Monitoring Automation](#part-2-email-monitoring-automation-1)
+        - [Data Schema](#data-schema)
+- [Data & Insights](#data--insights)
+    - [Metrics You Can Track](#metrics-you-can-track)
+    - [Sample Analysis Queries](#sample-analysis-queries)
+    - [Insights to Extrac](#insights-to-extract)
+- [For Different Audiences](#for-different-audiences)
+    - [For Employers](#for-employers)
+    - [For Operations, Support, & Enablement Professionals](#for-operations-support--enablement-professionals)
+    - [For Career Coaches & Job Seekers](#for-career-coaches--job-seekers)
+-[Repository Structure](#repository-structure) 
+
+---
+
+## Background
 
 Job search data reveals a brutal reality: 79% of candidates experience anxiety and burnout, spending 11-25 hours weekly on applications with online success rates of just 0.1-2%. Most rely on a single resume they tweak per role—an approach that fails in competitive markets but feels necessary when each application takes 30-45 minutes.
 
@@ -44,28 +75,6 @@ This system addresses all of these issues:
 - ✅ **Pattern recognition** - identify what works and adapt strategy accordingly
 
 **Real impact:** This system makes the job search process more manageable by reducing time waste, providing clear decision frameworks, and enabling pattern recognition. It won't guarantee outcomes—no system can in a competitive market—but it makes a brutal process less chaotic and more data-informed.
-
----
-
-## Table of Contents
-
-- [System Overview](#system-overview)
-- [What It Does](#what-it-does)
-- [Phase 1: Prompt Engineering Framework](#phase-1-prompt-engineering-framework)
-- [Phase 2: Complete Automation](#phase-2-complete-automation)
-    - [Part 1: Job Evaluation & Logging Automation](#part-1-job-evaluation--logging-automation)
-    - [Part 2: Email Monitoring Automation](#part-2-email-monitoring-automation)
-- [Example Output](#example-output)
-- [Skills Demonstrated](#skills-demonstrated)
-- [Limitations & Workarounds](#limitations--workarounds)
-- [Setup Guide](#setup-guide)
-    - [Prerequisites](#prerequisites)
-    - [Phase 1 Setup (15-20 minutes)](#phase-1-setup-15-20-minutes)
-    - [Phase 2:Complete Automation](#phase-2-complete-automation-1)
-        - [Part 1:Job Evaluation & Logging Automation](#part-1-job-evaluation--logging-automation-1)
-        - [Part 2: Email Monitoring Automation](#part-2-email-monitoring-automation-1)
-- [Data & Insights](#data--insights)
-- [For Different Audiences](#for-different-audiences)
 
 ---
 
@@ -733,7 +742,7 @@ This project demonstrates end-to-end problem-solving:
 
 ---
 
-### 💼 For Operations & Enablement Professionals
+### 💼 For Operations, Support, & Enablement Professionals
 
 **Interested in workflow automation without a coding background?**
 
