@@ -726,27 +726,6 @@ This project demonstrates end-to-end problem-solving:
 
 ---
 
-### 📚 For Career Coaches & Job Seekers
-
-**Want this system for yourself?**
-
-**Phase 1 (Prompt Engineering)** is free to use:
-- Prompts available in `/prompts` folder
-- Works with any ChatGPT Plus account
-- Customize for your background and preferences
-
-**Phase 2 (Full Automation)** requires:
-- Technical setup (N8N, API keys, OAuth)
-- Monthly costs (~$30-35 total)
-- 3-4 hours initial configuration
-
-**Need help implementing?** Connect with me for:
-- Guided setup sessions
-- Custom prompt development
-- Troubleshooting support
-
----
-
 ### 💼 For Operations & Enablement Professionals
 
 **Interested in workflow automation without a coding background?**
@@ -788,6 +767,27 @@ This project demonstrates how process improvement thinking translates to no-code
 - What metrics matter vs. what's just interesting data?
 
 **Let's connect:** Reach out to discuss process automation, no-code tools, systematic problem-solving, or transitioning from manual processes to automated workflows.
+
+---
+
+### 📚 For Career Coaches & Job Seekers
+
+**Want this system for yourself?**
+
+**Phase 1 (Prompt Engineering)** is free to use:
+- Prompts available in `/prompts` folder
+- Works with any ChatGPT Plus account
+- Customize for your background and preferences
+
+**Phase 2 (Full Automation)** requires:
+- Technical setup (N8N, API keys, OAuth)
+- Monthly costs (~$30-35 total)
+- 3-4 hours initial configuration
+
+**Need help implementing?** Connect with me for:
+- Guided setup sessions
+- Custom prompt development
+- Troubleshooting support
 
 ---
 
@@ -836,8 +836,8 @@ Built by a support operations professional who understands:
 **Questions? Feedback? Want to discuss implementation?**
 
 - **GitHub Issues:** Report bugs, request features, ask questions
-- **LinkedIn:** [Connect with me](#) to discuss workflow automation or job search strategies
-- **Email:** [Your contact] for consulting inquiries
+- **LinkedIn:** [Connect with me](https://www.linkedin.com/in/kimberlydking/) to discuss workflow automation or job search strategies
+- **Email:** kd [at] kdking [dot] business for consulting inquiries
 
 **Contributions Welcome:**
 - Alternative prompt variations
